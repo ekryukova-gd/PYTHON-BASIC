@@ -10,4 +10,8 @@ from typing import List
 
 
 def calculate_power_with_difference(ints: List[int]) -> List[int]:
-    ...
+    res = [ints[0]]
+    powers = [i**2 for i in ints]
+    for i in range(1, len(ints)):
+        res.append(powers[i] - (powers[i-1] - ints[i-1]))
+    return res
