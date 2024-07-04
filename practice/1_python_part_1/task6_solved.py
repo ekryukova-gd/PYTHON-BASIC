@@ -20,7 +20,8 @@ from typing import Tuple
 
 
 def get_min_max(filename: str) -> Tuple[int, int]:
-    res = [int(line) for line in open(filename)]
+    with open(filename, mode='r') as opened_file:
+        res = [int(line) for line in opened_file]
     return min(res), max(res)
 
 
