@@ -20,10 +20,10 @@ Examples:
 def read_numbers(n: int) -> str:
     nums = []
     for _ in range(n):
-        a = input()
-        if a.isdigit():
-            nums.append(float(a))
-    return 'Avg:' + '%.2f' % (sum(nums)/len(nums)) if nums else 'No numbers entered'
-    # тесты написаны неправильно что ругаются на кавычки?
+        user_input = input()
+        if user_input.isdigit():
+            nums.append(float(user_input))
+    return "Avg: " + str(round(sum(nums)/len(nums), 2)) if nums else "No numbers entered"
+    # if string formatting should be used: "Avg: " + "%.2f" % (sum(nums)/len(nums))
 
 
