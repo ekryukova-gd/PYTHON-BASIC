@@ -24,7 +24,7 @@ from typing import List, Any
 def delete_from_list(list_to_clean: List, item_to_delete: Any) -> List:
     res = []
     while list_to_clean:
-        elem = list_to_clean.pop(0)
+        elem = list_to_clean.pop()
         if elem != item_to_delete:
             res.append(elem)
-    return res
+    return res[::-1]
