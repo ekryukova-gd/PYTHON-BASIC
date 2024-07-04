@@ -10,11 +10,12 @@ Example:
         file1.txt (content: "abc\ndef\nxyz", encoding: UTF-8)
         file2.txt (content: "xyz,def,abc", encoding: CP1252)
 """
-import sys
 import os
+import sys
+from typing import List
 
 
-def generate_words(n=20):
+def generate_words(n: int = 20) -> List[str]:
     import string
     import random
 
@@ -25,15 +26,13 @@ def generate_words(n=20):
 
     return words
 
-
-path = sys.path[1]+'/practice/2_python_part_2/task_rw2_files'
+words_list = generate_words()
+path = os.path.join(sys.path[1], 'practice/2_python_part_2/task_rw2_files')
 if not os.path.exists(path):
      os.makedirs(path)
 
-with open(path+'/file1.txt', 'w', encoding='utf-8') as f1:
-    f1.writelines('\n'.join(generate_words()))
+with open(os.path.join(path, 'file1.txt'), 'w', encoding='utf-8') as f1:
+    f1.writelines('\n'.join(words_list))
 
-with open(path+'/file2.txt', 'w', encoding='CP1252') as f2:
-    with open(path+'/file1.txt', 'r', encoding='utf-8') as f1:
-        words_list = list(map(lambda x: x.strip('\n'), f1.readlines()))
+with open(os.path.join(path, 'file2.txt'), 'w', encoding='CP1252') as f2:
     f2.writelines(','.join(words_list[::-1]))
