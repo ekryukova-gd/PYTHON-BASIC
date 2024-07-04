@@ -23,7 +23,7 @@ def read_numbers(n: int) -> str:
         user_input = input()
         if user_input.isdigit():
             nums.append(float(user_input))
-    return "Avg: " + str(round(sum(nums)/len(nums), 2)) if nums else "No numbers entered"
+    return f"Avg: {(round(sum(nums)/len(nums), 2))}" if nums else "No numbers entered"
     # if string formatting should be used: "Avg: " + "%.2f" % (sum(nums)/len(nums))
 
 
