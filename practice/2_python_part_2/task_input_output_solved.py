@@ -18,6 +18,12 @@ Examples:
 
 
 def read_numbers(n: int) -> str:
-    ...
+    nums = []
+    for _ in range(n):
+        a = input()
+        if a.isdigit():
+            nums.append(float(a))
+    return 'Avg:' + '%.2f' % (sum(nums)/len(nums)) if nums else 'No numbers entered'
+    # тесты написаны неправильно что ругаются на кавычки?
 
 
