@@ -13,14 +13,15 @@ Examples:
 """
 from typing import List, Any
 
-#ver.1
+
+# ver.1
 # def delete_from_list(list_to_clean: List, item_to_delete: Any) -> List:
 #     for _ in range(list_to_clean.count(item_to_delete)):
 #         i = list_to_clean.index(item_to_delete)
 #         list_to_clean.pop(i)
 #     return list_to_clean
 
-#ver.2
+# ver.2
 def delete_from_list(list_to_clean: List, item_to_delete: Any) -> List:
     res = []
     while list_to_clean:

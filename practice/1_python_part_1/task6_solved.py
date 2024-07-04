@@ -20,15 +20,8 @@ from typing import Tuple
 
 
 def get_min_max(filename: str) -> Tuple[int, int]:
-    res = [float('inf'), float('-inf')]
-    with open(filename) as opened_file:
-        for line in opened_file:
-            if int(line) < res[0]:
-                res[0] = int(line)
-            elif int(line) > res[1]:
-                res[1] = int(line)
-    res = list(map(int, res))
-    return tuple(res)       # why does the warning about type remains?
+    res = [int(line) for line in open(filename)]
+    return min(res), max(res)
 
 
 filename = 'integers_for_task6.txt'
