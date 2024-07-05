@@ -7,12 +7,13 @@ In all cases it should print "Division finished"
     >>> division(1, 0)
     Division by 0
     Division finished
-    >>> division(1, 1)
+    >>> division(1, 1)  # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    DivisionByOneException: Deletion on 1 get the same result
     Division finished
-    DivisionByOneException("Deletion on 1 get the same result")
     >>> division(2, 2)
-    1
     Division finished
+    1
 """
 import typing
 
@@ -23,14 +24,15 @@ class DivisionByOneException(Exception):
 
 def division(x: int, y: int) -> typing.Union[None, int]:
     try:
-        res = x // y
-    except ZeroDivisionError:
-        print('Division by 0')
-        return None
-    else:
-        if y == 1:
-            raise DivisionByOneException('Deletion on 1 get the same result')
+        if y == 0:
+            print("Division by 0")
+            return None
+        elif y == 1:
+            raise DivisionByOneException("Deletion on 1 get the same result")
         else:
-            return res
+            return x // y
+    except DivisionByOneException as e:
+        print(e)
+        raise e
     finally:
-        print('Division finished')
+        print("Division finished")
