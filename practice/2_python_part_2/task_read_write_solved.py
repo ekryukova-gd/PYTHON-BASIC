@@ -13,16 +13,16 @@ Example:
 
     result.txt(content: "23, 78, 3")
 """
-from os import listdir
+import os
 import sys
 
-path = sys.path[1]+'/practice/2_python_part_2/files'
+path = os.path.join(sys.path[1], 'practice', '2_python_part_2', 'files')
 res = []
 
-for file in listdir(path):
-    with open(path + '/' + file, 'r') as f:
+for file in os.listdir(path):
+    with open(os.path.join(path, file), 'r') as f:
         for line in f:
             res.append(line)
 
-with open(path + '/result.txt', 'w') as f:
+with open(os.path.join(path, 'result.txt'), 'w') as f:
     f.write(', '.join(res))
