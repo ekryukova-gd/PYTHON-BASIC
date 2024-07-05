@@ -26,8 +26,9 @@ def generate_words(n: int = 20) -> List[str]:
 
     return words
 
+
 words_list = generate_words()
-path = os.path.join(sys.path[1], 'practice/2_python_part_2/task_rw2_files')
+path = os.path.join(sys.path[1], 'practice', '2_python_part_2', 'task_rw2_files')
 if not os.path.exists(path):
      os.makedirs(path)
 
