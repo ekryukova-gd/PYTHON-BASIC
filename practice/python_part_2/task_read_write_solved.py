@@ -16,7 +16,7 @@ Example:
 import os
 import sys
 
-path = os.path.join(sys.path[1], 'practice', '2_python_part_2', 'files')
+path = os.path.join(sys.path[1], 'practice', 'python_part_2', 'files')
 res = []
 
 for file in os.listdir(path):
