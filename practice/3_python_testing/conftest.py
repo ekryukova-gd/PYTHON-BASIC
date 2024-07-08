@@ -5,15 +5,15 @@ from practice.python_part_2.task_classes_solved import *
 
 
 @pytest.fixture
-def homework(text, days_to_complete):
-    return Homework(text, days_to_complete)
+def homework():
+    return Homework('homework_text_1', 5)
 
 @pytest.fixture
-def teacher(last_name, first_name):
-    return Teacher(last_name, first_name)
+def teacher():
+    return Teacher('Ivanov', 'Petr')
 
 @pytest.fixture
-def student(last_name, first_name):
-    return Student(last_name, first_name)
+def student():
+    return Student('Sidorov', 'Ivan')
 
 

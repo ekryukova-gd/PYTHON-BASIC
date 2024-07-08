@@ -8,34 +8,34 @@ import pytest
 import datetime
 from practice.python_part_2.task_classes_solved import *
 
-homeworks = [
-    ['homework1', 5],
-    ['homework2', 0],
-    ['homework3', -1]
-]
-
-teachers = [
-    ('Ivanov', 'Ivan'),
-    ('', ''),
-    (1231, 4312)
-]
+# homeworks = [
+#     ['homework1', 5],
+#     ['homework2', 0],
+#     ['homework3', -1]
+# ]
+#
+# teachers = [
+#     ('Ivanov', 'Ivan'),
+#     ('', ''),
+#     (1231, 4312)
+# ]
 @pytest.mark.classes
-@pytest.mark.parametrize(
-    'homework',
-    homeworks,
-    indirect=True
-)
+# @pytest.mark.parametrize(
+#     'homework',
+#     homeworks,
+#     indirect=True
+# )
 def test_Homework(homework):
     assert homework.deadline.days == 5
     assert homework.created.date() == datetime.date.today()
     assert homework.is_active() is True
 
 @pytest.mark.classes
-@pytest.mark.parametrize(
-    'teacher',
-    teachers,
-    indirect=True
-)
+# @pytest.mark.parametrize(
+#     'teacher',
+#     teachers,
+#     indirect=True
+# )
 def test_Teacher(teacher):
     assert teacher.last_name == 'Ivanov'
     assert teacher.first_name == 'Petr'
