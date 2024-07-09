@@ -8,7 +8,7 @@ TIP: to test output of print() function use capfd fixture
 https://stackoverflow.com/a/20507769
 """
 
-import unittest
+import pytest
 from practice.python_part_2.task_exceptions_solved import *
 
 def test_division_ok(capfd):
@@ -26,7 +26,7 @@ def test_division_by_zero(capfd):
 
 
 def test_division_by_one(capfd):
-    res = division(3, 1)
+    with pytest.raises(DivisionByOneException):
+        res = division(3, 1)
     out, err = capfd.readouterr()
     assert out == 'Deletion on 1 get the same result\nDivision finished\n'
-    unittest.TestCase.assertRaises(DivisionByOneException, division(3, 1))
