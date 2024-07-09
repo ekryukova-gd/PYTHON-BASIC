@@ -34,7 +34,7 @@ def rw2(path: str):
     with open(os.path.join(path, 'file1.txt'), 'w', encoding='utf-8') as f1:
         f1.writelines('\n'.join(words_list))
 
-    with open(os.path.join(path, 'file2.txt'), 'w', encoding='CP1252') as f2:
+    with open(os.path.join(path, 'file2.txt'), 'w', encoding='cp1252') as f2:
         f2.writelines(','.join(words_list[::-1]))
 
 
