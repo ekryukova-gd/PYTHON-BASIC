@@ -16,13 +16,16 @@ Example:
 import os
 import sys
 
-path = os.path.join(sys.path[1], 'practice', 'python_part_2', 'files')
-res = []
 
-for file in os.listdir(path):
-    with open(os.path.join(path, file), 'r') as f:
-        for line in f:
-            res.append(line)
+def read_write():
+    path = os.path.join(sys.path[1], 'practice', 'python_part_2', 'files')
+    res = []
 
-with open(os.path.join(path, 'result.txt'), 'w') as f:
-    f.write(', '.join(res))
+    for file in os.listdir(path):
+        with open(os.path.join(path, file), 'r') as f:
+            for line in f:
+                res.append(line)
+
+    with open(os.path.join(path, 'result.txt'), 'w') as f:
+        f.write(', '.join(res))
+    return
