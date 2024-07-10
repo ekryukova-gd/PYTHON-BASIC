@@ -10,12 +10,25 @@ Examples:
      11
 """
 import math
+import pytest
 
 
-def math_calculate(function: str, *args):
-    ...
+class OperationNotFoundException(Exception):
+    pass
+
+def math_calculate(function: str, *args) -> float | int:
+    try:
+        return eval(f'math.{function}{args}')
+    except AttributeError:
+        raise OperationNotFoundException('Operation not found')
 
 
 """
 Write tests for math_calculate function
 """
+
+
+@pytest.mark.math_calculate
+@pytest.mark.parametrize('result, function, args', [(False, 'isnan', 5), (11, 'ceil', 10.7), (9, 'pow', (3, 2))])
+def test_math_calculate(result, function: str, args) -> None:
+    assert math_calculate(function, args) == result
