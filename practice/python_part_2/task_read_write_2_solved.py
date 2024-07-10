@@ -26,14 +26,18 @@ def generate_words(n: int = 20) -> List[str]:
 
     return words
 
+def rw2(path: str):
+    words_list = generate_words()
+    if not os.path.exists(path):
+        os.makedirs(path)
 
-words_list = generate_words()
-path = os.path.join(sys.path[1], 'practice', 'python_part_2', 'task_rw2_files')
-if not os.path.exists(path):
-     os.makedirs(path)
+    with open(os.path.join(path, 'file1.txt'), 'w', encoding='utf-8') as f1:
+        f1.writelines('\n'.join(words_list))
 
-with open(os.path.join(path, 'file1.txt'), 'w', encoding='utf-8') as f1:
-    f1.writelines('\n'.join(words_list))
+    with open(os.path.join(path, 'file2.txt'), 'w', encoding='cp1252') as f2:
+        f2.writelines(','.join(words_list[::-1]))
 
-with open(os.path.join(path, 'file2.txt'), 'w', encoding='CP1252') as f2:
-    f2.writelines(','.join(words_list[::-1]))
+
+if __name__ == '__main__':
+    path = os.path.join(sys.path[1], 'practice', 'python_part_2', 'task_rw2_files')
+    rw2(path)
