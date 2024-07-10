@@ -13,7 +13,8 @@ import pytest
 
 
 # 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233
-def fibonacci_1(n):
+def fibonacci_1(n: int) -> int:
+    """returns nth element of Fibonacci sequence"""
     a, b = 0, 1
     for _ in range(n-1):
         a, b = b, a + b
@@ -28,16 +29,17 @@ def fibonacci_1(n):
 
 
 # fixed fibbonacci_2
-def fibonacci_2(n):
+def fibonacci_2(n: int) -> int:
+    """returns nth element of Fibonacci sequence"""
     fibo = [0, 1]
     for i in range(2, n+1):
         fibo.append(fibo[i-1] + fibo[i-2])
     return fibo[n]
 
 @pytest.mark.parametrize('n, result', [(1, 1), (2, 1), (7, 13)])
-def test_fibonacci_1(n, result):
+def test_fibonacci_1(n: int, result: int) -> None:
     assert fibonacci_1(n) == result
 
 @pytest.mark.parametrize('n, result', [(1, 1), (2, 1), (7, 13)])
-def test_fibonacci_2(n, result):
+def test_fibonacci_2(n: int, result: int) -> None:
     assert fibonacci_2(n) == result
