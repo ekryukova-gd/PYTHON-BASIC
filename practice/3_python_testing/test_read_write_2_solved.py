@@ -26,23 +26,13 @@ def is_valid_encoding(filepath, encoding):
 def test_rw2():
     with tempfile.TemporaryDirectory() as temp_dir:
         task_read_write_2_solved.rw2(temp_dir)
-        # with open(os.path.join(temp_dir, 'file1.txt'), 'rb') as result_file1:
-        #     with open(os.path.join(temp_dir, 'file2.txt'), 'rb') as result_file2:
-        #         f1 = result_file1.read()
-        #         f2 = result_file2.read()
-        #
-        #         suggestion1 = chardet.detect(f1)
-        #         suggestion2 = chardet.detect(f2)
-        #
-        #         assert suggestion1['encoding'].lower() == 'utf-8'
-        #         assert suggestion2['encoding'].lower() == 'cp1252'
         path_file1 = os.path.join(temp_dir, 'file1.txt')
         path_file2 = os.path.join(temp_dir, 'file2.txt')
         with open(path_file1, 'r') as result_file1:
-            with open(path_file2, 'r') as result_file2:
                 f1 = result_file1.read()
+        with open(path_file2, 'r') as result_file2:
                 f2 = result_file2.read()
-                assert f1 == '\n'.join(f2.split(',')[::-1])
-                assert is_valid_encoding(path_file1, 'utf-8')
-                assert is_valid_encoding(path_file2, 'cp1252')
+        assert f1 == '\n'.join(f2.split(',')[::-1])
+        assert is_valid_encoding(path_file1, 'utf-8')
+        assert is_valid_encoding(path_file2, 'cp1252')
 
