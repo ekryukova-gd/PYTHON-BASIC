@@ -17,22 +17,33 @@ Example:
 import argparse
 from faker import Faker
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from io import StringIO
+import subprocess
 import sys
 
 
-parser = argparse.ArgumentParser(prog='task_4_solved.py')
+parser = argparse.ArgumentParser()
 parser.add_argument('n', type=int, nargs='?', default=1, help='number of generated instances')
-parser.add_argument('--fake-address', help='fake address')
-parser.add_argument('--some-name', help='fake name')
+parser.add_argument('--fields', nargs='+', help='list of FIELD=PROVIDER statements')
 args = parser.parse_args()
 
 
 def print_name_address(args: argparse.Namespace) -> None:
     fake = Faker()
+    result = []
     for _ in range(args.n):
-        print({'some_name': getattr(fake, args.some_name)(), 'fake-address': getattr(fake, args.fake_address)()})
+        line = {}
+        for field in args.fields:
+            key, provider = field.split('=')
+            if hasattr(fake, provider):
+                line[key] = getattr(fake, provider)()
+            else:
+                raise ValueError(f'"{provider}" is not a valid Faker provider')
+        result.append(line)
+
+    for el in result:
+        print(el)
 
 
 """
@@ -48,33 +59,36 @@ Example:
 
 class TestPrintNameAddress(unittest.TestCase):
 
-    def test_print_name_address(self):
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('argparse.ArgumentParser.parse_args')
+    def test_print_name_address(self, mock_parse_args, mock_stdout):
         # Create a Mock object to simulate argparse.Namespace
         mock_args = Mock()
-        mock_args.n = 2
-        mock_args.some_name = 'name'
-        mock_args.fake_address = 'address'
+        mock_args.n = 3
+        mock_args.fields = ['test_name=name', 'test_address=address', 'test_text=text']
 
-
-        # Redirect stdout to capture print output
-        captured_output = StringIO()
-        sys.stdout = captured_output
+        # Mock the return value of parse_args to return mock_args
+        mock_parse_args.return_value = mock_args
 
         # Call the function with the mock arguments
         print_name_address(mock_args)
 
-        # Reset redirect
-        sys.stdout = sys.__stdout__
+        # Capture the printed output
+        printed_output = mock_stdout.getvalue()
 
-        # Check the printed output
-        printed_lines = captured_output.getvalue().strip().split('\n')
-        self.assertEqual(len(printed_lines), 2)  # Check number of printed lines
+        # Split the printed output into lines
+        printed_lines = printed_output.strip().split('\n')
+
+        self.assertEqual(len(printed_lines), mock_args.n)  # Check number of printed lines
         for line in printed_lines:
             dict_result = eval(line)  # Safely evaluate string to dictionary
-            self.assertIn('some_name', dict_result)
-            self.assertIn('fake-address', dict_result)
+            self.assertIn('test_name', dict_result)
+            self.assertIn('test_address', dict_result)
+            self.assertIn('test_text', dict_result)
 
 
 # print_name_address(args)
 if __name__ == '__main__':
-    unittest.main()
+    if '--unittest' in sys.argv:
+        subprocess.call([sys.executable, '-m', 'unittest', 'discover'])
+    print_name_address(args)
