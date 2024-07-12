@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import sys
 from io import StringIO
-import xml.etree.ElementTree as ET
+from lxml import etree as ET
 
 
 # read data from json files
@@ -49,10 +49,6 @@ spain_summary = {'mean_temp': weather_summary_by_city['mean_temp'].mean(),
                                                               weather_summary_by_city['mean_temp'].max()].index[0],
                  'windiest_place': weather_summary_by_city.loc[weather_summary_by_city['mean_wind_speed']==
                                                               weather_summary_by_city['mean_wind_speed'].max()].index[0]}
-#
-# print(spain_summary)
-#
-# print(weather_summary_by_city.dtypes)
 
 # Create root element <weather>
 
@@ -63,10 +59,10 @@ root.set("date", "2021-09-25")
 # Add summary element <summary>
 summary = ET.SubElement(root, "summary")
 for key, value in spain_summary.items():
-    if type(value) is not str:
+    if isinstance(value, float):
         summary.set(key, str(round(value, 2)))
     else:
-        summary.set(key, value)
+        summary.set(key, str(value))
 
 # Add cities element <cities>
 cities = ET.SubElement(root, "cities")
@@ -77,7 +73,8 @@ for city in weather_summary_by_city.index:
         city_name.set(attribute, str(round(weather_summary_by_city.loc[city][attribute], 2)))
 
 
-xml_data = ET.tostring(root)  # binary string
+xml_data = ET.tostring(root, pretty_print=True, encoding='utf-8')
+
 with open('result.xml', 'w') as f:  # Write in file as utf-8
     f.write(xml_data.decode('utf-8'))
 
