@@ -32,3 +32,76 @@ Links:
     - lxml docs: https://lxml.de/
 """
 
+import requests
+from bs4 import BeautifulSoup
+import re
+import pandas as pd
+
+
+base_url = 'https://finance.yahoo.com'
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                         'AppleWebKit/537.36 (KHTML, like Gecko)'
+                         'Chrome/102.0.0.0 '
+                         'Safari/537.36'}
+
+
+page = requests.get(base_url+'/most-active', headers=headers)
+soup = BeautifulSoup(page.content, "html.parser")
+
+stocks_table = soup.find(id="scr-res-table")
+
+stocks = []
+
+for stock in stocks_table.find_all('a', href=True):
+    stock_info = {'Name': stock['title'],
+                 'Code': stock.text}
+
+    stock_profile_page = requests.get(base_url + stock['href'] + 'profile', headers=headers)
+    soup = BeautifulSoup(stock_profile_page.content, "html.parser")
+
+    # parsing Country from stock Profile page
+    try:
+        company_address = soup.find('div', class_='address')
+        address = []
+        for div in company_address.find_all('div'):
+            address.append(div.text.strip())
+        stock_info['Country'] = address[-1]
+    except:
+        pass
+
+    # parsing number of Employees
+    try:
+        company_stats = soup.find('dl', class_='company-stats')
+        stats = []
+        for div in company_stats.find_all('div'):
+            stats.append(div.text.strip())
+        stock_info['Employees'] = int(stats[-1].split('\xa0')[-1].strip().replace(',', ''))
+    except:
+        pass
+
+    # parsing CEO name, CEO Year Born from stock Profile page
+    try:
+        CEO = soup.find('td', string=re.compile('.*CEO.*')).parent.find_all('td')
+        for i in range(len(CEO)):
+            CEO[i] = CEO[i].text.strip()
+        stock_info['CEO Name'] = CEO[0]
+        stock_info['CEO Year Born'] = CEO[-1]
+    except:
+        pass
+
+    stocks.append(stock_info)
+
+df = pd.DataFrame(stocks)
+
+df_5_youngest_ceo = df.sort_values(by='CEO Year Born', ascending=False).head(5)
+df_5_youngest_ceo = df_5_youngest_ceo[['Name', 'Code', 'Country', 'Employees', 'CEO Name', 'CEO Year Born']]
+
+# first sheet printing
+sheet_output = df_5_youngest_ceo.to_markdown(index=False, tablefmt="github", numalign='left', stralign='left')
+print('5 stocks with youngest CEOs'.center(len(sheet_output.split('\n')[0]), '='))
+print(sheet_output)
+print()
+
+
+
+
