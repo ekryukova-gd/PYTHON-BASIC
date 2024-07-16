@@ -37,7 +37,6 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from io import StringIO
 
-
 BASE_URL = 'https://finance.yahoo.com'
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                          'AppleWebKit/537.36 (KHTML, like Gecko)'
@@ -45,7 +44,7 @@ HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                          'Safari/537.36'}
 
 
-def get_soup(path:str) -> BeautifulSoup:
+def get_soup(path: str) -> BeautifulSoup:
     page = requests.get(path, headers=HEADERS)
     soup = BeautifulSoup(page.content, 'html.parser')
     return soup
@@ -60,7 +59,7 @@ def find_info_with_parent(soup: BeautifulSoup, lookup_tag: str, text: str) -> li
 
 
 def find_info_no_parent(soup: BeautifulSoup, lookup_tag: str, text: str) -> list:
-    tag_info = soup.find(lambda tag: tag.name == lookup_tag,  {'class': text})
+    tag_info = soup.find(lambda tag: tag.name == lookup_tag, {'class': text})
     res = []
     for el in tag_info.find_all(lookup_tag):
         res.append(el.text)
@@ -78,7 +77,7 @@ def parse_profile_page(stock_info: dict, stock: str) -> dict:
     try:
         text = 'address'
         tag_info = find_info_no_parent(soup=soup_profile, lookup_tag='div', text=text)
-        stock_info['Country'] = tag_info[-1]
+        stock_info['Country'] = tag_info[-1].strip()
     except:
         pass
 
@@ -96,8 +95,8 @@ def parse_profile_page(stock_info: dict, stock: str) -> dict:
     try:
         text = 'CEO'
         tag_info = find_info_with_parent(soup_profile, lookup_tag='td', text=text)
-        stock_info['CEO Name'] = tag_info[0]
-        stock_info['CEO Year Born'] = tag_info[-1]
+        stock_info['CEO Name'] = tag_info[0].strip()
+        stock_info['CEO Year Born'] = tag_info[-1].strip()
     except:
         pass
 
@@ -112,7 +111,7 @@ def parse_statistics_page(stock_info: dict, stock: str) -> dict:
     try:
         text = '52 Week Range'
         tag_info = find_info_with_parent(soup=soup_stats, lookup_tag='td', text=text)
-        stock_info[text] = tag_info[-1]
+        stock_info[text] = tag_info[-1].strip()
     except:
         pass
 
@@ -145,6 +144,7 @@ def sheet_printing(df, sheet_title):
     print(sheet_output)
     print()
 
+
 # first sheet printing
 """
     1. 5 stocks with most youngest CEOs and print sheet to output. You can find CEO info in Profile tab of concrete stock.
@@ -155,16 +155,14 @@ df_5_youngest_ceo = (df[['Name', 'Code', 'Country', 'Employees', 'CEO Name', 'CE
                      .sort_values(by='CEO Year Born', ascending=False).head(5))
 sheet_printing(df_5_youngest_ceo, '5 stocks with youngest CEOs')
 
-
 # 2nd sheet printing
 """
 2. 10 stocks with best 52-Week Change. 52-Week Change placed on Statistics tab.
     Sheet's fields: Name, Code, 52-Week Change, Total Cash (Changed for 52 Week Range as it is the changing value)
 """
 df_10_best_52_week_range = (df[['Name', 'Code', '52 Week Range', 'Total Cash']]
-                     .sort_values(by='52 Week Range', ascending=False).head(10))
+                            .sort_values(by='52 Week Range', ascending=False).head(10))
 sheet_printing(df_10_best_52_week_range, '10 stocks with best 52 Week Range')
-
 
 # 3rd sheet printing
 """
@@ -173,6 +171,8 @@ sheet_printing(df_10_best_52_week_range, '10 stocks with best 52 Week Range')
     Sheet's fields: Name, Code, Shares, Date Reported, % Out, Value.
     All fields except first two should be taken from Holders tab.
 """
+
+
 def convert_shorthand_to_number(s):
     """
     converts number string with K, M, B as number suffix to float
@@ -205,14 +205,14 @@ def convert_number_to_shorthand(num):
     return formatted_number
 
 
-
 def parse_holders_page(quote):
     quote_soup = get_soup(BASE_URL + '/quote' + f'/{quote}' + '/holders')
     holders_top_institutional_table = quote_soup.find('section',
-                                                      attrs={'data-testid': 'holders-top-institutional-holders'}).find('table')
+                                                      attrs={'data-testid': 'holders-top-institutional-holders'}).find(
+        'table')
 
     holders_top_mutual_funds_table = quote_soup.find('section',
-                                                      attrs={'data-testid': 'holders-top-mutual-fund-holders'})
+                                                     attrs={'data-testid': 'holders-top-mutual-fund-holders'})
 
     df_holders = pd.DataFrame()
     for table in [holders_top_institutional_table, holders_top_mutual_funds_table]:
@@ -222,8 +222,9 @@ def parse_holders_page(quote):
     return df_holders
 
 
-quote = 'BLK'
-df_largest_10_holds = (parse_holders_page(quote)[['Holder', 'Shares', 'Date Reported', '% Out', 'Value']]
-                     .sort_values(by='Shares', ascending=False).head(10))
-df_largest_10_holds['Shares'] = df_largest_10_holds['Shares'].apply(convert_number_to_shorthand)
-sheet_printing(df_largest_10_holds, '10 largest holds of Blackrock Inc')
+if __name__ == '__main__':
+    quote = 'BLK'
+    df_largest_10_holds = (parse_holders_page(quote)[['Holder', 'Shares', 'Date Reported', '% Out', 'Value']]
+                           .sort_values(by='Shares', ascending=False).head(10))
+    df_largest_10_holds['Shares'] = df_largest_10_holds['Shares'].apply(convert_number_to_shorthand)
+    sheet_printing(df_largest_10_holds, '10 largest holds of Blackrock Inc')
