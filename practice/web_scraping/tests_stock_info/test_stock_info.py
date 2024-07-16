@@ -28,6 +28,7 @@ def mocked_soup_statistics():
     return BeautifulSoup(statistics_html, 'html.parser')
 
 
+@pytest.mark.stock_scrapping
 def test_parse_profile_page(mocked_soup_profile):
     stock_info = {'Name': 'Blackrock Inc.', 'Code': 'BLK', 'href': '/quote/BLK'}
 
@@ -42,6 +43,7 @@ def test_parse_profile_page(mocked_soup_profile):
     assert stock_info['CEO Year Born'] == '1952'
 
 
+@pytest.mark.stock_scrapping
 def test_parse_statistics_page(mocked_soup_statistics):
     stock_info = {'Name': 'Blackrock Inc.', 'Code': 'BLK', 'href': '/quote/BLK'}
 

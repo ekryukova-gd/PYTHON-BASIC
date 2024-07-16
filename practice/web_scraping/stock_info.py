@@ -54,7 +54,7 @@ def find_info_with_parent(soup: BeautifulSoup, lookup_tag: str, text: str) -> li
     tag_info = soup.find(lambda tag: tag.name == lookup_tag and text in tag.text)
     res = []
     for el in tag_info.parent.find_all(lookup_tag):
-        res.append(el.text)
+        res.append(el.text.strip())
     return res
 
 
@@ -62,7 +62,7 @@ def find_info_no_parent(soup: BeautifulSoup, lookup_tag: str, text: str) -> list
     tag_info = soup.find(lambda tag: tag.name == lookup_tag, {'class': text})
     res = []
     for el in tag_info.find_all(lookup_tag):
-        res.append(el.text)
+        res.append(el.text.strip())
     return res
 
 
@@ -77,7 +77,7 @@ def parse_profile_page(stock_info: dict, stock: str) -> dict:
     try:
         text = 'address'
         tag_info = find_info_no_parent(soup=soup_profile, lookup_tag='div', text=text)
-        stock_info['Country'] = tag_info[-1].strip()
+        stock_info['Country'] = tag_info[-1]
     except:
         pass
 
@@ -95,8 +95,8 @@ def parse_profile_page(stock_info: dict, stock: str) -> dict:
     try:
         text = 'CEO'
         tag_info = find_info_with_parent(soup_profile, lookup_tag='td', text=text)
-        stock_info['CEO Name'] = tag_info[0].strip()
-        stock_info['CEO Year Born'] = tag_info[-1].strip()
+        stock_info['CEO Name'] = tag_info[0]
+        stock_info['CEO Year Born'] = tag_info[-1]
     except:
         pass
 
@@ -111,7 +111,7 @@ def parse_statistics_page(stock_info: dict, stock: str) -> dict:
     try:
         text = '52 Week Range'
         tag_info = find_info_with_parent(soup=soup_stats, lookup_tag='td', text=text)
-        stock_info[text] = tag_info[-1].strip()
+        stock_info[text] = tag_info[-1]
     except:
         pass
 
@@ -124,53 +124,11 @@ def parse_statistics_page(stock_info: dict, stock: str) -> dict:
     return stock_info
 
 
-soup = get_soup(BASE_URL + '/most-active')
-stocks_table = soup.find(id="scr-res-table")
-stocks = []
-
-for stock in stocks_table.find_all('a', href=True):
-    stock_info = {'Name': stock['title'],
-                  'Code': stock.text}
-    parse_profile_page(stock_info, stock)
-    parse_statistics_page(stock_info, stock)
-    stocks.append(stock_info)
-
-df = pd.DataFrame(stocks)
-
-
 def sheet_printing(df, sheet_title):
     sheet_output = df.to_markdown(index=False, tablefmt="github", numalign='left', stralign='left')
     print(sheet_title.center(len(sheet_output.split('\n')[0]), '='))
     print(sheet_output)
     print()
-
-
-# first sheet printing
-"""
-    1. 5 stocks with most youngest CEOs and print sheet to output. You can find CEO info in Profile tab of concrete stock.
-    Sheet's fields: Name, Code, Country, Employees, CEO Name, CEO Year Born.
-"""
-
-df_5_youngest_ceo = (df[['Name', 'Code', 'Country', 'Employees', 'CEO Name', 'CEO Year Born']]
-                     .sort_values(by='CEO Year Born', ascending=False).head(5))
-sheet_printing(df_5_youngest_ceo, '5 stocks with youngest CEOs')
-
-# 2nd sheet printing
-"""
-2. 10 stocks with best 52-Week Change. 52-Week Change placed on Statistics tab.
-    Sheet's fields: Name, Code, 52-Week Change, Total Cash (Changed for 52 Week Range as it is the changing value)
-"""
-df_10_best_52_week_range = (df[['Name', 'Code', '52 Week Range', 'Total Cash']]
-                            .sort_values(by='52 Week Range', ascending=False).head(10))
-sheet_printing(df_10_best_52_week_range, '10 stocks with best 52 Week Range')
-
-# 3rd sheet printing
-"""
-3. 10 largest holds of Blackrock Inc. You can find related info on the Holders tab.
-    Blackrock Inc is an investment management corporation.
-    Sheet's fields: Name, Code, Shares, Date Reported, % Out, Value.
-    All fields except first two should be taken from Holders tab.
-"""
 
 
 def convert_shorthand_to_number(s):
@@ -207,12 +165,11 @@ def convert_number_to_shorthand(num):
 
 def parse_holders_page(quote):
     quote_soup = get_soup(BASE_URL + '/quote' + f'/{quote}' + '/holders')
-    holders_top_institutional_table = quote_soup.find('section',
-                                                      attrs={'data-testid': 'holders-top-institutional-holders'}).find(
-        'table')
-
-    holders_top_mutual_funds_table = quote_soup.find('section',
-                                                     attrs={'data-testid': 'holders-top-mutual-fund-holders'})
+    holders_top_institutional_table = (quote_soup.find('section',
+                                                      attrs={'data-testid': 'holders-top-institutional-holders'})
+                                       .find('table'))
+    holders_top_mutual_funds_table = (quote_soup.find('section', attrs={'data-testid': 'holders-top-mutual-fund-holders'})
+                                      .find('table'))
 
     df_holders = pd.DataFrame()
     for table in [holders_top_institutional_table, holders_top_mutual_funds_table]:
@@ -223,6 +180,43 @@ def parse_holders_page(quote):
 
 
 if __name__ == '__main__':
+    soup = get_soup(BASE_URL + '/most-active')
+    stocks_table = soup.find(id="scr-res-table")
+    stocks = []
+
+    for stock in stocks_table.find_all('a', href=True):
+        stock_info = {'Name': stock['title'],
+                      'Code': stock.text}
+        parse_profile_page(stock_info, stock)
+        parse_statistics_page(stock_info, stock)
+        stocks.append(stock_info)
+
+    df = pd.DataFrame(stocks)
+    # first sheet printing
+    """
+        1. 5 stocks with most youngest CEOs and print sheet to output. You can find CEO info in Profile tab of concrete stock.
+        Sheet's fields: Name, Code, Country, Employees, CEO Name, CEO Year Born.
+    """
+
+    df_5_youngest_ceo = (df[['Name', 'Code', 'Country', 'Employees', 'CEO Name', 'CEO Year Born']]
+                         .sort_values(by='CEO Year Born', ascending=False).head(5))
+    sheet_printing(df_5_youngest_ceo, '5 stocks with youngest CEOs')
+
+    # 2nd sheet printing
+    """
+    2. 10 stocks with best 52-Week Change. 52-Week Change placed on Statistics tab.
+        Sheet's fields: Name, Code, 52-Week Change, Total Cash (Changed for 52 Week Range as it is the changing value)
+    """
+    df_10_best_52_week_range = (df[['Name', 'Code', '52 Week Range', 'Total Cash']]
+                                .sort_values(by='52 Week Range', ascending=False).head(10))
+    sheet_printing(df_10_best_52_week_range, '10 stocks with best 52 Week Range')
+    # 3rd sheet printing
+    """
+    3. 10 largest holds of Blackrock Inc. You can find related info on the Holders tab.
+        Blackrock Inc is an investment management corporation.
+        Sheet's fields: Name, Code, Shares, Date Reported, % Out, Value.
+        All fields except first two should be taken from Holders tab.
+    """
     quote = 'BLK'
     df_largest_10_holds = (parse_holders_page(quote)[['Holder', 'Shares', 'Date Reported', '% Out', 'Value']]
                            .sort_values(by='Shares', ascending=False).head(10))
