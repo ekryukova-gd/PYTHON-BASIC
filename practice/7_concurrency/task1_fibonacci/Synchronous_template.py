@@ -1,18 +1,16 @@
 import os
-import sys
-import shutil
 from random import randint
 import time
-import multiprocessing as mp
-from concurrent.futures import ProcessPoolExecutor
+import sys
 
 sys.set_int_max_str_digits(100000)
+
 
 OUTPUT_DIR = './output'
 RESULT_FILE = './output/result.csv'
 
 
-def fib(n: int) -> int:
+def fib(n: int):
     """Calculate a value in the Fibonacci sequence by ordinal number"""
 
     f0, f1 = 0, 1
@@ -21,21 +19,19 @@ def fib(n: int) -> int:
     return f1
 
 
-def func1(array: list) -> None:
+def func1(array: list):
     """
     takes a list of numbers, which are ordinal numbers in the Fibonacci sequence.
     The function must calculate the value for each ordinal number of the sequence and write it to a separate file.
     The ordinal numbers can be large.
     """
-    with ProcessPoolExecutor(max_workers=5, mp_context=mp.get_context('fork')) as ex:
-        res = ex.map(fib, array)
-    for number, result in zip(array, res):
-        with open(os.path.join(OUTPUT_DIR, f'{number}.txt'), 'w') as file:
-            file.write(str(result))
+    for el in array:
+        res = fib(el)
+        with open(os.path.join(OUTPUT_DIR, f'{el}.txt'), 'w') as file:
+            file.write(str(res))
 
 
-
-def func2(result_file: str) -> None:
+def func2(result_file: str):
     """
     takes the path to the folder where the files are located after starting the first function.
     The function should read values from each file and make one common csv file with the ordinal number
@@ -51,9 +47,9 @@ def func2(result_file: str) -> None:
 
 
 if __name__ == '__main__':
-    if os.path.exists(OUTPUT_DIR):
-        shutil.rmtree(OUTPUT_DIR)
-    os.mkdir(OUTPUT_DIR)
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+    # start_time = time.time()
     start_time_func1 = time.time()
     func1(array=[randint(1000, 100000) for _ in range(1000)])
     end_time_func1 = time.time()
