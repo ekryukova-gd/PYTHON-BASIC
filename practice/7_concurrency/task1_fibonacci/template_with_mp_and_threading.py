@@ -27,7 +27,7 @@ def func1(array: list) -> None:
     Calculates the value for each ordinal number of the sequence and write it to a separate file.
     The ordinal numbers can be large.
     """
-    with ProcessPoolExecutor(max_workers=5, mp_context=mp.get_context('fork')) as ex:
+    with ProcessPoolExecutor(max_workers = min(32, os.cpu_count() + 4), mp_context=mp.get_context('fork')) as ex:
         res = ex.map(fib, array)
     for number, result in zip(array, res):
         with open(os.path.join(OUTPUT_DIR, f'{number}.txt'), 'w') as file:
@@ -47,7 +47,7 @@ def func2(result_file: str) -> None:
 
     files = [file for file in os.listdir(OUTPUT_DIR) if file.endswith('.txt')]
     res = []
-    with ThreadPoolExecutor(max_workers=5) as ex:
+    with ThreadPoolExecutor(max_workers = min(32, os.cpu_count() + 4)) as ex:
         ex.map(read_from_files, files)
 
     with open(result_file, 'w') as output_file:
