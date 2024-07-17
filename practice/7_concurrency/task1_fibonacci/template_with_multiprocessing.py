@@ -24,7 +24,7 @@ def fib(n: int) -> int:
 def func1(array: list) -> None:
     """
     takes a list of numbers, which are ordinal numbers in the Fibonacci sequence.
-    The function must calculate the value for each ordinal number of the sequence and write it to a separate file.
+    Calculates the value for each ordinal number of the sequence and write it to a separate file.
     The ordinal numbers can be large.
     """
     with ProcessPoolExecutor(max_workers=5, mp_context=mp.get_context('fork')) as ex:
@@ -38,7 +38,7 @@ def func1(array: list) -> None:
 def func2(result_file: str) -> None:
     """
     takes the path to the folder where the files are located after starting the first function.
-    The function should read values from each file and make one common csv file with the ordinal number
+    Reads values from each file and makes one common csv file with the ordinal number
     and its value in the Fibonacci sequence.
     """
     res = []
@@ -49,17 +49,31 @@ def func2(result_file: str) -> None:
     with open(result_file, 'w') as output_file:
         output_file.write('\n'.join(res))
 
+def measure_execution_time(func, *args, **kwargs):
+    start_time = time.time()
+    func(*args, **kwargs)
+    end_time = time.time()
+    return end_time - start_time
+
+def main(runs=5):
+    times_func1 = []
+    times_func2 = []
+
+    for _ in range(runs):
+        if os.path.exists(OUTPUT_DIR):
+            shutil.rmtree(OUTPUT_DIR)
+        os.mkdir(OUTPUT_DIR)
+
+        array = [randint(1000, 100000) for _ in range(1000)]
+        times_func1.append(measure_execution_time(func1, array=array))
+        times_func2.append(measure_execution_time(func2, result_file=RESULT_FILE))
+
+    mean_time_func1 = sum(times_func1) / len(times_func1)
+    mean_time_func2 = sum(times_func2) / len(times_func2)
+
+    print(f'Average execution time over {runs} runs:')
+    print(f'func1: {round(mean_time_func1, 2)} seconds')
+    print(f'func2: {round(mean_time_func2, 2)} seconds')
 
 if __name__ == '__main__':
-    if os.path.exists(OUTPUT_DIR):
-        shutil.rmtree(OUTPUT_DIR)
-    os.mkdir(OUTPUT_DIR)
-    start_time_func1 = time.time()
-    func1(array=[randint(1000, 100000) for _ in range(1000)])
-    end_time_func1 = time.time()
-    start_time_func2 = time.time()
-    func2(result_file=RESULT_FILE)
-    end_time_func2 = time.time()
-    print(f'Finished in {round(end_time_func2 - start_time_func1, 2)} seconds')
-    print(f'func1 took {round(end_time_func1 - start_time_func1, 2)} seconds')
-    print(f'func2 took {round(end_time_func2 - start_time_func2, 2)} seconds')
+    main(runs=5)
