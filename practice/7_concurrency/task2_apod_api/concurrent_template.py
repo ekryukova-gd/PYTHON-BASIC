@@ -4,9 +4,10 @@ import json
 import shutil
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 import time
+import secrets
 
 
-API_KEY = "3mPLgcbJu0dn1gCUTzeK0LRgwVNNcEFBumFjNpIh"
+API_KEY = secrets.API_KEY
 APOD_ENDPOINT = 'https://api.nasa.gov/planetary/apod'
 OUTPUT_IMAGES = './output'
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
@@ -32,7 +33,7 @@ def download_apod_images(metadata: list):
                 r.raw.decode_content = True
                 shutil.copyfileobj(r.raw, f)
 
-    with ThreadPoolExecutor(max_workers=min(32, os.cpu_count() + 4)) as ex:
+    with ThreadPoolExecutor(max_workers=None) as ex:
         ex.map(save_image_to_file, metadata)
 
 

@@ -3,9 +3,10 @@ import requests
 import json
 import shutil
 import time
+import secrets
 
 
-API_KEY = "3mPLgcbJu0dn1gCUTzeK0LRgwVNNcEFBumFjNpIh"
+API_KEY = secrets.API_KEY
 APOD_ENDPOINT = 'https://api.nasa.gov/planetary/apod'
 OUTPUT_IMAGES = './output'
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
@@ -48,10 +49,8 @@ def measure_execution_time(func, *args, **kwargs):
 
 def main():
     metadata = get_apod_metadata(
-        # start_date='2021-08-01',
-        # end_date='2021-09-30',
         start_date='2021-08-01',
-        end_date='2021-08-03',
+        end_date='2021-09-30',
         api_key=API_KEY,
     )
     print(f'execution time {round(measure_execution_time(download_apod_images, metadata=metadata), 2)} seconds')
