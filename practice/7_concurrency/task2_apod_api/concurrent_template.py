@@ -4,7 +4,7 @@ import json
 import shutil
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 import time
-import secrets
+import secrets # get you API_KEY from https://api.nasa.gov/
 
 
 API_KEY = secrets.API_KEY
