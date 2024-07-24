@@ -24,6 +24,6 @@ def get_min_max(filename: str) -> Tuple[int, int]:
         res = [int(line) for line in opened_file]
     return min(res), max(res)
 
-
-filename = 'integers_for_task6.txt'
-print(get_min_max(filename))
+if __name__ == '__main__':
+    filename = 'integers_for_task6.txt'
+    print(get_min_max(filename))

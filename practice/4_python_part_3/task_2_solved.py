@@ -29,6 +29,6 @@ Write tests for math_calculate function
 
 
 @pytest.mark.math_calculate
-@pytest.mark.parametrize('result, function, args', [(False, 'isnan', 5), (11, 'ceil', 10.7), (9, 'pow', (3, 2))])
+@pytest.mark.parametrize('result, function, args', [(False, 'isnan', (5,)), (11, 'ceil', (10.7,)), (9, 'pow', (3, 2))])
 def test_math_calculate(result, function: str, args) -> None:
-    assert math_calculate(function, args) == result
+    assert math_calculate(function, *args) == result
